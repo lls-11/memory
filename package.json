@@ -1,0 +1,16 @@
+{
+  "name": "persona-agent",
+  "version": "0.1.0",
+  "description": "拟人化对话智能体框架：认知循环 + 可插拔模块（记忆/技能/人格…）",
+  "type": "module",
+  "main": "core/agent.js",
+  "scripts": {
+    "start": "node cli.js",
+    "test": "node test/smoke.js",
+    "demo:memory": "node demo/memory-demo.js"
+  },
+  "dependencies": {
+    "openai": "^4.0.0"
+  },
+  "engines": { "node": ">=18" }
+}
