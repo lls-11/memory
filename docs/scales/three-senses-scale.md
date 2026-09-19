@@ -3,6 +3,7 @@
 **Three-Senses Scale — 无助感 · 无意义感 · 绝望感**
 
 > 配套：结构诊断与计分脚本 [`tss-scoring.js`](./tss-scoring.js)
+> 可直接施测的卷面：[`tss-30-form.html`](./tss-30-form.html)（30 题打乱呈现、即时计分与剖面图、作答质量自检，可打印）
 > 理论与实验基础：[`../experiments/three-senses-loop.md`](../experiments/three-senses-loop.md)
 
 ---

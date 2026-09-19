@@ -1,0 +1,563 @@
+<title>三感量表 TSS-30</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --paper:#f4f4f2; --card:#ffffff; --card-2:#fafaf8;
+  --ink:#17181a; --ink-2:#55575c; --ink-3:#8a8c92;
+  --rule:#e2e2de; --rule-2:#cfcfc9;
+  --h:#2a78d6; --m:#eb6834; --d:#1baf7a;
+  --pd:#6b6d73;
+  --flagbg:#fdf3e8; --flagink:#8a4b12; --flagrule:#e8c9a4;
+  --font-serif:"Songti SC","STSong","Noto Serif CJK SC","Source Han Serif SC",serif;
+  --font-sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --paper:#131417; --card:#1b1c1f; --card-2:#202125;
+    --ink:#f1f1ef; --ink-2:#a8aaaf; --ink-3:#74767b;
+    --rule:#2b2d31; --rule-2:#3b3d42;
+    --h:#3987e5; --m:#d95926; --d:#199e70;
+    --pd:#9a9ca2;
+    --flagrule:#4a3722;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --paper:#131417; --card:#1b1c1f; --card-2:#202125;
+  --ink:#f1f1ef; --ink-2:#a8aaaf; --ink-3:#74767b;
+  --rule:#2b2d31; --rule-2:#3b3d42;
+  --h:#3987e5; --m:#d95926; --d:#199e70;
+  --pd:#9a9ca2;
+  --flagbg:#2a2018; --flagink:#e0b280; --flagrule:#4a3722;
+}
+
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--font-sans); font-size:15px; line-height:1.7;
+  -webkit-text-size-adjust:100%;
+}
+*{box-sizing:border-box}
+.wrap{max-width:760px; margin:0 auto; padding-inline:16px; padding-block:0 64px}
+
+/* ── sticky 进度条 ───────────────────────────────────────── */
+.bar{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:20;
+  background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:blur(8px); border-bottom:1px solid var(--rule);
+  margin-inline:-16px; padding:8px 16px;
+}
+.bar-in{max-width:760px; margin:0 auto; display:flex; align-items:center; gap:12px}
+.track{flex:1; height:4px; background:var(--rule); border-radius:2px; overflow:hidden}
+.fill{height:100%; width:0%; background:var(--ink); border-radius:2px; transition:width .25s ease}
+.count{font-family:var(--font-mono); font-size:12px; font-variant-numeric:tabular-nums; color:var(--ink-2); white-space:nowrap}
+
+/* ── 卷头 ────────────────────────────────────────────────── */
+header.masthead{padding-block:36px 8px}
+.eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+h1{font-family:var(--font-serif); font-size:30px; line-height:1.25; margin:.3em 0 .1em; text-wrap:balance; letter-spacing:.01em}
+.sub{font-family:var(--font-serif); font-size:16px; color:var(--ink-2); margin:0}
+.meta{display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:16px; font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3)}
+.meta b{color:var(--ink-2); font-weight:500}
+
+.notice{
+  margin-top:22px; border:1px solid var(--rule-2); border-left:3px solid var(--ink-3);
+  background:var(--card-2); padding:14px 16px; font-size:13.5px; line-height:1.65; color:var(--ink-2);
+}
+.notice p{margin:0 0 .6em} .notice p:last-child{margin:0}
+.notice strong{color:var(--ink)}
+
+/* ── 指导语 + 锚点图例 ───────────────────────────────────── */
+section.instr{margin-top:28px; padding:18px 18px 16px; background:var(--card); border:1px solid var(--rule)}
+.instr h2{font-family:var(--font-serif); font-size:17px; margin:0 0 .5em}
+.instr p{margin:0 0 .8em; font-size:14px; color:var(--ink-2)}
+.frame{display:inline-block; font-family:var(--font-mono); font-size:12px; border:1px solid var(--rule-2); padding:1px 7px; color:var(--ink)}
+.legend{display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-top:14px; border-top:1px solid var(--rule); padding-top:14px}
+.legend div{text-align:center}
+.legend .lg-n{font-family:var(--font-mono); font-size:15px; font-weight:600; color:var(--ink)}
+.legend .lg-t{font-size:11px; line-height:1.35; color:var(--ink-3); margin-top:2px}
+
+/* ── 工具条 ─────────────────────────────────────────────── */
+.tools{display:flex; flex-wrap:wrap; gap:8px; margin-top:20px}
+button{
+  font-family:inherit; font-size:13px; color:var(--ink); background:var(--card);
+  border:1px solid var(--rule-2); padding:7px 13px; cursor:pointer; line-height:1.4;
+}
+button:hover{background:var(--card-2); border-color:var(--ink-3)}
+button:focus-visible{outline:2px solid var(--h); outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+
+/* ── 题目 ───────────────────────────────────────────────── */
+ol.items{list-style:none; margin:26px 0 0; padding:0; border-top:1px solid var(--rule)}
+li.item{border-bottom:1px solid var(--rule); padding:16px 0; display:grid; grid-template-columns:30px 1fr; gap:0 10px}
+li.item.answered{background:linear-gradient(90deg, var(--card-2), transparent 60%)}
+.qno{font-family:var(--font-mono); font-size:12.5px; color:var(--ink-3); font-variant-numeric:tabular-nums; padding-top:3px}
+.stem{font-size:15.5px; line-height:1.65}
+.stem .rk{font-family:var(--font-mono); font-size:10px; color:var(--ink-3); border:1px solid var(--rule-2); padding:0 4px; margin-left:6px; vertical-align:2px}
+.tag{display:none; font-family:var(--font-mono); font-size:10.5px; padding:1px 6px; margin-left:7px; vertical-align:2px; color:var(--paper)}
+.revealed .tag{display:inline}
+.tag.t-H{background:var(--h)} .tag.t-M{background:var(--m)} .tag.t-D{background:var(--d)} .tag.t-PD{background:var(--pd)}
+.opts{grid-column:2; display:grid; grid-template-columns:repeat(5,1fr); gap:5px; margin-top:11px}
+.opt{position:relative; display:flex; flex-direction:column; align-items:center; gap:2px;
+     border:1px solid var(--rule-2); background:var(--card); padding:7px 2px 6px; cursor:pointer;
+     transition:background .12s, border-color .12s}
+.opt input{position:absolute; opacity:0; width:1px; height:1px; margin:0}
+.opt .n{font-family:var(--font-mono); font-size:15px; font-weight:500; color:var(--ink-2); font-variant-numeric:tabular-nums}
+.opt .a{font-size:10.5px; line-height:1.3; text-align:center; color:var(--ink-3)}
+.opt:hover{background:var(--card-2); border-color:var(--ink-3)}
+.opt:has(:focus-visible){outline:2px solid var(--h); outline-offset:1px}
+.opt:has(:checked){background:var(--ink); border-color:var(--ink)}
+.opt:has(:checked) .n,.opt:has(:checked) .a{color:var(--paper)}
+
+/* ── 剖面 ───────────────────────────────────────────────── */
+.profile{margin-top:34px; background:var(--card); border:1px solid var(--rule); padding:20px 18px}
+.profile h2{font-family:var(--font-serif); font-size:20px; margin:0 0 2px; display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.badge{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; padding:2px 7px; border:1px solid var(--rule-2); color:var(--ink-3); text-transform:uppercase}
+.badge.live{border-color:var(--h); color:var(--h)}
+.phint{font-size:13px; color:var(--ink-2); margin:6px 0 20px}
+
+.chart{position:relative}
+.axis{position:relative; height:16px; margin-left:var(--lab); border-bottom:1px solid var(--rule-2)}
+.axis span{position:absolute; bottom:2px; transform:translateX(-50%); font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3)}
+.row{display:grid; grid-template-columns:var(--lab) 1fr; gap:0 10px; align-items:center; padding:7px 0}
+:root{--lab:92px}
+.rowlab{text-align:right}
+.rowlab .nm{font-size:13.5px; font-weight:500; line-height:1.3}
+.rowlab .ch{font-family:var(--font-mono); font-size:10px; color:var(--ink-3); display:block; margin-top:1px}
+.gauge{position:relative; height:22px; background:
+  linear-gradient(to right, var(--rule) 0 1px, transparent 1px) 25% 0/25% 100% repeat-x;}
+.gauge::before{content:""; position:absolute; inset:0; border-left:1px solid var(--rule)}
+.gbar{position:absolute; top:3px; bottom:3px; left:0; border-radius:0 4px 4px 0; min-width:2px;
+      transition:width .3s ease}
+.g-H{background:var(--h)} .g-M{background:var(--m)} .g-D{background:var(--d)}
+.g-PD{background:transparent; border:1.5px dashed var(--pd); border-left:none; border-radius:0 4px 4px 0}
+.gval{position:absolute; top:50%; transform:translateY(-50%); left:calc(100% + 7px);
+      font-family:var(--font-mono); font-size:12px; font-variant-numeric:tabular-nums; color:var(--ink); white-space:nowrap}
+.gval.na{color:var(--ink-3)}
+.rowsep{margin:14px 0 4px; border:0; border-top:1px dashed var(--rule-2)}
+.pdnote{font-size:12px; color:var(--ink-3); margin:2px 0 0 var(--lab); padding-left:10px}
+
+.tip{position:fixed; z-index:40; pointer-events:none; opacity:0; transition:opacity .12s;
+     background:var(--ink); color:var(--paper); font-size:12px; line-height:1.55; padding:8px 10px; max-width:230px;}
+.tip.on{opacity:1}
+.tip b{font-weight:600} .tip .tm{font-family:var(--font-mono); font-variant-numeric:tabular-nums}
+
+/* ── 计分表 ─────────────────────────────────────────────── */
+.tblwrap{overflow-x:auto; margin-top:24px}
+table{border-collapse:collapse; width:100%; min-width:430px; font-size:13px}
+caption{text-align:left; font-family:var(--font-serif); font-size:15px; color:var(--ink); padding-bottom:8px}
+th,td{border-bottom:1px solid var(--rule); padding:7px 8px; text-align:left}
+th{font-family:var(--font-mono); font-size:11px; letter-spacing:.05em; color:var(--ink-3); font-weight:500; text-transform:uppercase}
+td.num{font-family:var(--font-mono); font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap}
+tr.dom td{font-weight:600} tr.dom td:first-child{border-left:3px solid var(--ink)}
+tr.dom.r-H td:first-child{border-left-color:var(--h)}
+tr.dom.r-M td:first-child{border-left-color:var(--m)}
+tr.dom.r-D td:first-child{border-left-color:var(--d)}
+tr.dom.r-PD td:first-child{border-left-color:var(--pd)}
+tr.fac td:first-child{padding-left:20px; color:var(--ink-2); font-family:var(--font-mono); font-size:12px}
+
+.flags{margin-top:22px; border:1px solid var(--rule); padding:14px 16px; font-size:13px}
+.flags h3{font-family:var(--font-serif); font-size:15px; margin:0 0 8px}
+.flags ul{margin:0; padding-left:18px; color:var(--ink-2)}
+.flags li{margin:2px 0}
+.flags .ok{color:var(--d)}
+.flags.hit{background:var(--flagbg); border-color:var(--flagrule); color:var(--flagink)}
+.flags.hit h3,.flags.hit ul{color:inherit}
+
+footer{margin-top:40px; padding-top:20px; border-top:1px solid var(--rule); font-size:12.5px; color:var(--ink-3); line-height:1.7}
+footer a{color:var(--ink-2)}
+h2.sech{font-family:var(--font-serif); font-size:18px; margin:34px 0 0}
+
+@media (max-width:460px){
+  :root{--lab:70px}
+  h1{font-size:25px}
+  .legend{grid-template-columns:repeat(5,1fr); gap:4px}
+  .legend .lg-t{font-size:9.5px}
+  .opt .a{font-size:9.5px}
+  li.item{grid-template-columns:24px 1fr}
+  .opts{grid-column:1/-1}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+@media print{
+  :root{--paper:#fff; --card:#fff; --card-2:#fff; --ink:#000; --ink-2:#333; --ink-3:#666; --rule:#ccc; --rule-2:#999}
+  body{font-size:11pt}
+  .bar,.tools,.tip,.noprint{display:none!important}
+  .opt:has(:checked){background:#fff!important}
+  .opt:has(:checked) .n,.opt:has(:checked) .a{color:#000!important}
+  .opt:has(:checked)::after{content:""; position:absolute; inset:2px; border:2px solid #000}
+  li.item{break-inside:avoid} .profile,.flags{break-before:page}
+  .revealed .tag{color:#000; background:#fff!important; border:1px solid #000}
+}
+</style>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="count" id="count">0 / 30</div>
+  </div>
+</div>
+
+<div class="wrap">
+<header class="masthead">
+  <div class="eyebrow">Three-Senses Scale · 编制阶段草案 v0.1</div>
+  <h1>三感量表</h1>
+  <p class="sub">无助感 · 无意义感 · 绝望感</p>
+  <div class="meta">
+    <span><b>30</b> 题</span>
+    <span>约 <b>6</b> 分钟</span>
+    <span>时间框架 <b>过去两周</b></span>
+    <span>5 点频率</span>
+    <span>反向题 <b>3</b> 道</span>
+  </div>
+</header>
+
+<div class="notice">
+  <p><strong>这份卷子是研究用的草案，不是诊断工具。</strong>它还没有完成信效度验证，没有常模，也没有切分点——所以它不会告诉你"你属于哪一档"，只会把你的作答画成一张剖面图，让你看清三个维度里哪一个更突出。</p>
+  <p><strong>它不能用来评估自杀风险。</strong>卷面里没有任何自杀相关条目，这是刻意的设计。如果你正被这类念头困扰，请直接联系专业帮助：心理援助热线 <b>12356</b>，或当地精神卫生中心、校内心理咨询。</p>
+  <p><strong>你的作答只留在这个页面里。</strong>不上传、不保存、不写入浏览器存储；关掉页面就没有了。</p>
+</div>
+
+<section class="instr">
+  <h2>怎么填</h2>
+  <p>下面每句话描述一种感受。请想一想 <span class="frame">过去两周</span> 里，这句话符合你的<strong>频率</strong>有多高，选一个数字。不要在单题上停留太久——第一反应通常最准。</p>
+  <p style="color:var(--ink-3);font-size:13px">题目是打乱顺序排的，作答时看不到每题属于哪个维度，这是为了避免你被维度名称带着走。填完后可以点"显示维度归属"把它们翻出来。</p>
+  <div class="legend">
+    <div><div class="lg-n">1</div><div class="lg-t">几乎<br>没有</div></div>
+    <div><div class="lg-n">2</div><div class="lg-t">有<br>几天</div></div>
+    <div><div class="lg-n">3</div><div class="lg-t">一半<br>以上</div></div>
+    <div><div class="lg-n">4</div><div class="lg-t">几乎<br>每天</div></div>
+    <div><div class="lg-n">5</div><div class="lg-t">一直<br>如此</div></div>
+  </div>
+</section>
+
+<div class="tools noprint">
+  <button type="button" id="btnReveal" aria-pressed="false">显示维度归属</button>
+  <button type="button" id="btnDemo">载入示例作答</button>
+  <button type="button" id="btnClear">清空</button>
+  <button type="button" id="btnJump">跳到剖面</button>
+</div>
+
+<ol class="items" id="items"></ol>
+
+<h2 class="sech">你的剖面</h2>
+<section class="profile" id="profile">
+  <h2>三感剖面 <span class="badge" id="pbadge">示例数据</span></h2>
+  <p class="phint" id="phint">这是一份示例作答画出来的图，用来说明剖面怎么读。你开始答题后，它会换成你自己的结果。</p>
+
+  <div class="chart" id="chart">
+    <div class="axis" id="axis"></div>
+    <div id="rows"></div>
+    <hr class="rowsep">
+    <div id="rowpd"></div>
+    <p class="pdnote">预先放弃是独立模块，<strong>不计入总分</strong>——它测的是"还没试就先放弃"这个动作，对应闭环边「绝望 → 无助」。</p>
+  </div>
+
+  <div class="tblwrap">
+    <table>
+      <caption>计分表（维度取所属条目均值；缺失超过 25% 的维度不计分，也不插补）</caption>
+      <thead><tr><th>维度 / 侧面</th><th>断裂位置</th><th>已答</th><th>得分</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="flags" id="flags">
+    <h3>作答质量自检</h3>
+    <ul id="flaglist"></ul>
+  </div>
+</section>
+
+<footer>
+  <p>维度结构取自动机链的三处断裂：<strong>行动 → 结果</strong>（无助）、<strong>结果 → 价值</strong>（无意义）、<strong>未来</strong>（绝望）。每个维度 3 个侧面 × 3 题，各含 1 道反向题。</p>
+  <p>本卷对应 TSS-30 特质版。另有 12 题简版与"此刻/7 点"的状态版（供实验室多轮测量与经验取样使用），两版量程不同，<strong>不可互相换算</strong>。</p>
+  <p>条目与计分规则为公开草案，可自由用于研究与教学；正式使用前须完成条目分析、双因子结构检验与增量效度验证。</p>
+</footer>
+</div>
+
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<script>
+/* ── 条目表 ──────────────────────────────────────────────────────────
+   no   : 卷面题号（打乱后的呈现顺序）
+   bank : 题库编号（对应条目池 TSS-53）
+   dom  : H 无助 / M 无意义 / D 绝望 / PD 预先放弃
+   fac  : 侧面代码
+   r    : 反向计分
+------------------------------------------------------------------- */
+const ITEMS = [
+  {no: 1, bank: 1,  dom:'H', fac:'H-a', t:'我做的事和最后的结果之间，好像没什么关系。'},
+  {no: 2, bank:16,  dom:'M', fac:'M-a', t:'我做成什么，其实都不重要。'},
+  {no: 3, bank:31,  dom:'D', fac:'D-a', t:'往后的日子只会更难。'},
+  {no: 4, bank: 2,  dom:'H', fac:'H-a', t:'不管我怎么努力，事情的走向都差不多。'},
+  {no: 5, bank:17,  dom:'M', fac:'M-a', t:'有没有我，对周围的事没什么差别。'},
+  {no: 6, bank:32,  dom:'D', fac:'D-a', t:'我预料以后不会有什么好事。'},
+  {no: 7, bank: 6,  dom:'H', fac:'H-b', t:'我的生活由我控制不了的事情决定。'},
+  {no: 8, bank:21,  dom:'M', fac:'M-b', t:'我不知道自己在为什么忙。'},
+  {no: 9, bank:36,  dom:'D', fac:'D-b', t:'我现在这个样子，以后也变不了。'},
+  {no:10, bank:46,  dom:'PD',fac:'PD',  t:'我索性不去试，免得又一次证明没用。'},
+  {no:11, bank: 3,  dom:'H', fac:'H-a', t:'结果好不好，跟我做了什么没有关系。'},
+  {no:12, bank:18,  dom:'M', fac:'M-a', t:'我做的事对别人是有价值的。', r:true},
+  {no:13, bank:33,  dom:'D', fac:'D-a', t:'我期待以后的生活。', r:true},
+  {no:14, bank: 7,  dom:'H', fac:'H-b', t:'重要的事情上，决定权不在我手里。'},
+  {no:15, bank:22,  dom:'M', fac:'M-b', t:'我做的事说不上是为了什么。'},
+  {no:16, bank:37,  dom:'D', fac:'D-b', t:'我的处境是定了的，改不动。'},
+  {no:17, bank:11,  dom:'H', fac:'H-c', t:'我已经使了劲，但什么也没改变。'},
+  {no:18, bank:26,  dom:'M', fac:'M-c', t:'我的生活是一堆连不起来的碎片。'},
+  {no:19, bank:41,  dom:'D', fac:'D-c', t:'我想不出几年以后的自己是什么样。'},
+  {no:20, bank:47,  dom:'PD',fac:'PD',  t:'在开始之前，我就已经放弃了。'},
+  {no:21, bank: 8,  dom:'H', fac:'H-b', t:'遇到问题时，我有办法去影响它。', r:true},
+  {no:22, bank:24,  dom:'M', fac:'M-b', t:'我每天在做的事，找不到目的。'},
+  {no:23, bank:39,  dom:'D', fac:'D-b', t:'就算再给我很多时间，也还是这样。'},
+  {no:24, bank:12,  dom:'H', fac:'H-c', t:'再多做一点也是白做。'},
+  {no:25, bank:27,  dom:'M', fac:'M-c', t:'发生在我身上的事，我讲不出个所以然。'},
+  {no:26, bank:42,  dom:'D', fac:'D-c', t:'我没法为以后做计划。'},
+  {no:27, bank:13,  dom:'H', fac:'H-c', t:'我付出的努力最后都落空了。'},
+  {no:28, bank:29,  dom:'M', fac:'M-c', t:'我搞不懂我的日子是按什么在走。'},
+  {no:29, bank:44,  dom:'D', fac:'D-c', t:'「以后」这件事对我来说是空的。'},
+  {no:30, bank:52,  dom:'PD',fac:'PD',  t:'我停下来之后，更觉得自己确实做不到。'},
+];
+
+const ANCHORS = [['1','几乎<br>没有'],['2','有<br>几天'],['3','一半<br>以上'],['4','几乎<br>每天'],['5','一直<br>如此']];
+const MIN = 1, MAX = 5;
+const revv = x => MIN + MAX - x;
+
+const DOMS = {
+  H:  {name:'无助感',   chain:'行动 → 结果', facets:{'H-a':'随因失联','H-b':'控制外置','H-c':'无效努力'}},
+  M:  {name:'无意义感', chain:'结果 → 价值', facets:{'M-a':'重要性缺失','M-b':'目的缺失','M-c':'连贯性缺失'}},
+  D:  {name:'绝望感',   chain:'价值 → 未来', facets:{'D-a':'未来负性预期','D-b':'不可改变性','D-c':'未来视野塌缩'}},
+  PD: {name:'预先放弃', chain:'绝望 → 无助', facets:{'PD':'预先放弃'}},
+};
+const CARELESS = {longString:15, irvMin:0.30, reverseGap:2.0};
+
+/* 示例作答：一份"无意义感偏高、无助中等、绝望偏低"的剖面，并在反向题上正确反选 */
+const DEMO = {1:3,2:4,3:2,4:3,5:4,6:2,7:4,8:5,9:2,10:3,11:2,12:2,13:4,14:3,15:4,
+              16:2,17:3,18:4,19:3,20:2,21:2,22:5,23:1,24:3,25:3,26:2,27:3,28:4,29:2,30:3};
+
+/* ── 渲染题目 ─────────────────────────────────────────────────── */
+const ol = document.getElementById('items');
+ol.innerHTML = ITEMS.map(it => `
+  <li class="item" id="item-${it.no}">
+    <div class="qno">${String(it.no).padStart(2,'0')}</div>
+    <div class="stem">${it.t}${it.r ? '<span class="rk" title="反向计分题">R</span>' : ''}<span class="tag t-${it.dom}">${DOMS[it.dom].name}${it.fac !== 'PD' ? ' · ' + DOMS[it.dom].facets[it.fac] : ''} · 题库 ${it.bank}</span></div>
+    <div class="opts" role="radiogroup" aria-label="第 ${it.no} 题：${it.t}">
+      ${ANCHORS.map(([n,a]) => `
+        <label class="opt">
+          <input type="radio" name="q${it.no}" id="q${it.no}v${n}" value="${n}">
+          <span class="n">${n}</span><span class="a">${a}</span>
+        </label>`).join('')}
+    </div>
+  </li>`).join('');
+
+/* ── 读取作答 ─────────────────────────────────────────────────── */
+function readResponses(){
+  const r = {};
+  for (const it of ITEMS){
+    const el = document.querySelector(`input[name="q${it.no}"]:checked`);
+    if (el) r[it.no] = Number(el.value);
+  }
+  return r;
+}
+
+/* ── 计分：与 tss-scoring.js 的规则一致 ───────────────────────── */
+function score(r){
+  const out = {};
+  for (const dom of ['H','M','D','PD']){
+    const items = ITEMS.filter(i => i.dom === dom);
+    const vals = [];
+    for (const it of items){
+      const v = r[it.no];
+      if (v === undefined) continue;
+      vals.push(it.r ? revv(v) : v);
+    }
+    const missing = items.length - vals.length;
+    const facets = {};
+    for (const fac of Object.keys(DOMS[dom].facets)){
+      const fi = items.filter(i => i.fac === fac);
+      const fv = fi.map(i => r[i.no] === undefined ? null : (i.r ? revv(r[i.no]) : r[i.no])).filter(v => v !== null);
+      facets[fac] = {n: fv.length, k: fi.length,
+                     val: fv.length ? fv.reduce((a,b)=>a+b,0)/fv.length : null};
+    }
+    out[dom] = {
+      n: vals.length, k: items.length, facets,
+      val: missing / items.length > 0.25 ? null : vals.reduce((a,b)=>a+b,0)/vals.length,
+    };
+  }
+  const core = ['H','M','D'].map(d => out[d].val);
+  out.TOTAL = core.some(v => v === null) ? null : core.reduce((a,b)=>a+b,0)/3;
+  return out;
+}
+
+/* ── 作答质量筛查 ─────────────────────────────────────────────── */
+function flags(r){
+  const seq = ITEMS.map(i => r[i.no]).filter(v => v !== undefined);
+  if (!seq.length) return null;
+  let longest = 1, run = 1;
+  for (let i = 1; i < seq.length; i++){
+    run = seq[i] === seq[i-1] ? run + 1 : 1;
+    if (run > longest) longest = run;
+  }
+  const m = seq.reduce((a,b)=>a+b,0) / seq.length;
+  const irv = Math.sqrt(seq.reduce((a,v)=>a+(v-m)**2,0) / seq.length);
+  let gap = 0, gapKnown = false;
+  for (const dom of ['H','M','D']){
+    const items = ITEMS.filter(i => i.dom === dom);
+    const pick = list => {
+      const v = list.map(i => r[i.no]).filter(x => x !== undefined);
+      return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null;
+    };
+    const fwd = pick(items.filter(i => !i.r)), rvs = pick(items.filter(i => i.r));
+    if (fwd === null || rvs === null) continue;
+    gapKnown = true;
+    gap = Math.max(gap, Math.abs(fwd - revv(rvs)));
+  }
+  return {n: seq.length, longString: longest, irv, gap, gapKnown,
+          hits: [
+            longest >= CARELESS.longString ? `连续 ${longest} 题选了同一个数字（阈值 ${CARELESS.longString}）` : null,
+            irv < CARELESS.irvMin && seq.length >= 10 ? `作答几乎没有变化（IRV ${irv.toFixed(2)} < ${CARELESS.irvMin}）` : null,
+            gapKnown && gap >= CARELESS.reverseGap ? `反向题与正向题方向矛盾（偏离 ${gap.toFixed(1)} 分 ≥ ${CARELESS.reverseGap}）` : null,
+          ].filter(Boolean)};
+}
+
+/* ── 画剖面 ───────────────────────────────────────────────────── */
+const axis = document.getElementById('axis');
+axis.innerHTML = [1,2,3,4,5].map(v =>
+  `<span style="left:${(v-MIN)/(MAX-MIN)*100}%">${v}</span>`).join('');
+
+const pct = v => ((v - MIN) / (MAX - MIN)) * 100;
+
+function gaugeRow(dom, s){
+  const d = DOMS[dom], v = s.val;
+  const w = v === null ? 0 : Math.max(pct(v), 0.6);
+  return `<div class="row" data-dom="${dom}" tabindex="0">
+    <div class="rowlab"><div class="nm">${d.name}</div><span class="ch">${d.chain}</span></div>
+    <div class="gauge">
+      <div class="gbar g-${dom}" style="width:${w}%"></div>
+      <div class="gval ${v===null?'na':''}">${v === null ? `未计分 · ${s.n}/${s.k}` : v.toFixed(2)}</div>
+    </div>
+  </div>`;
+}
+
+function render(){
+  const r = readResponses();
+  const answered = Object.keys(r).length;
+  const isDemo = answered === 0;
+  const data = isDemo ? DEMO : r;
+  const s = score(data);
+
+  document.getElementById('fill').style.width = (answered / ITEMS.length * 100) + '%';
+  document.getElementById('count').textContent = `${answered} / ${ITEMS.length}`;
+  for (const it of ITEMS)
+    document.getElementById('item-' + it.no).classList.toggle('answered', r[it.no] !== undefined);
+
+  const badge = document.getElementById('pbadge'), hint = document.getElementById('phint');
+  if (isDemo){
+    badge.textContent = '示例数据'; badge.classList.remove('live');
+    hint.textContent = '这是一份示例作答画出来的图，用来说明剖面怎么读。你开始答题后，它会换成你自己的结果。';
+  } else {
+    badge.textContent = `你的作答 · ${answered}/30`; badge.classList.add('live');
+    hint.textContent = answered < ITEMS.length
+      ? '正在按已答条目实时计分。某个维度缺失超过 25% 时不给分——这是量表本身的规则，不做插补。'
+      : '全部答完。得分是所属条目的均值，范围 1–5；没有切分点，请把它读作剖面的形状，而不是一个等级。';
+  }
+
+  document.getElementById('rows').innerHTML = ['H','M','D'].map(d => gaugeRow(d, s[d])).join('');
+  document.getElementById('rowpd').innerHTML = gaugeRow('PD', s.PD);
+
+  // 计分表（同时充当图表的表格视图）
+  let rows = '';
+  for (const dom of ['H','M','D','PD']){
+    const d = DOMS[dom], sd = s[dom];
+    rows += `<tr class="dom r-${dom}"><td>${d.name}</td><td>${d.chain}</td>
+      <td class="num">${sd.n}/${sd.k}</td>
+      <td class="num">${sd.val === null ? '—' : sd.val.toFixed(2)}</td></tr>`;
+    if (dom === 'PD') continue;
+    for (const [fac, fname] of Object.entries(d.facets)){
+      const f = sd.facets[fac];
+      rows += `<tr class="fac"><td>${fac} ${fname}</td><td></td>
+        <td class="num">${f.n}/${f.k}</td>
+        <td class="num">${f.val === null ? '—' : f.val.toFixed(2)}</td></tr>`;
+    }
+  }
+  rows += `<tr class="dom"><td>三感总分</td><td>H / M / D 的平均</td><td class="num">—</td>
+    <td class="num">${s.TOTAL === null ? '—' : s.TOTAL.toFixed(2)}</td></tr>`;
+  document.getElementById('tbody').innerHTML = rows;
+
+  // 作答质量
+  const f = flags(data), box = document.getElementById('flags'), list = document.getElementById('flaglist');
+  if (!f){ box.className = 'flags'; list.innerHTML = '<li>还没有作答。</li>'; }
+  else if (f.hits.length){
+    box.className = 'flags hit';
+    list.innerHTML = f.hits.map(h => `<li>${h}</li>`).join('')
+      + '<li>这类作答在研究里会被标记出来人工核查，而不是直接删除——阈值本身也要按样本重新校准。</li>';
+  } else {
+    box.className = 'flags';
+    list.innerHTML = `<li class="ok">没有发现异常作答模式。</li>
+      <li>最长连续同一答案 <b>${f.longString}</b> 题（阈值 ${CARELESS.longString}）</li>
+      <li>作答变异 IRV <b>${f.irv.toFixed(2)}</b>（下限 ${CARELESS.irvMin}）</li>
+      <li>反向题方向偏离 ${f.gapKnown ? `<b>${f.gap.toFixed(1)}</b> 分（阈值 ${CARELESS.reverseGap}）` : '尚未答完反向题'}</li>`;
+  }
+  LAST = {s, isDemo};
+}
+let LAST = null;
+
+/* ── hover 提示 ───────────────────────────────────────────────── */
+const tip = document.getElementById('tip');
+function showTip(e, dom){
+  if (!LAST) return;
+  const d = DOMS[dom], sd = LAST.s[dom];
+  const facs = Object.entries(d.facets).map(([fac, nm]) => {
+    const f = sd.facets[fac];
+    return `${nm} <span class="tm">${f.val === null ? '—' : f.val.toFixed(2)}</span>`;
+  }).join('<br>');
+  tip.innerHTML = `<b>${d.name}</b> · ${d.chain}<br>
+    得分 <span class="tm">${sd.val === null ? '未计分' : sd.val.toFixed(2)}</span>
+    （已答 <span class="tm">${sd.n}/${sd.k}</span>）<br>${facs}
+    ${dom === 'PD' ? '<br>不计入总分' : ''}`;
+  tip.classList.add('on');
+  const r = tip.getBoundingClientRect();
+  const x = ('clientX' in e ? e.clientX : e.target.getBoundingClientRect().left + 40);
+  const y = ('clientY' in e ? e.clientY : e.target.getBoundingClientRect().top);
+  tip.style.left = Math.min(Math.max(8, x + 14), innerWidth - r.width - 8) + 'px';
+  tip.style.top  = Math.min(Math.max(8, y + 14), innerHeight - r.height - 8) + 'px';
+}
+document.getElementById('chart').addEventListener('pointermove', e => {
+  const row = e.target.closest('.row');
+  row ? showTip(e, row.dataset.dom) : tip.classList.remove('on');
+});
+document.getElementById('chart').addEventListener('pointerleave', () => tip.classList.remove('on'));
+document.getElementById('chart').addEventListener('focusin', e => {
+  const row = e.target.closest('.row');
+  if (row) showTip(e, row.dataset.dom);
+});
+document.getElementById('chart').addEventListener('focusout', () => tip.classList.remove('on'));
+
+/* ── 交互 ─────────────────────────────────────────────────────── */
+ol.addEventListener('change', render);
+
+document.getElementById('btnReveal').addEventListener('click', e => {
+  const on = e.currentTarget.getAttribute('aria-pressed') === 'true';
+  e.currentTarget.setAttribute('aria-pressed', String(!on));
+  e.currentTarget.textContent = on ? '显示维度归属' : '隐藏维度归属';
+  document.body.classList.toggle('revealed', !on);
+});
+document.getElementById('btnDemo').addEventListener('click', () => {
+  for (const [no, v] of Object.entries(DEMO)){
+    const el = document.getElementById(`q${no}v${v}`);
+    if (el) el.checked = true;
+  }
+  render();
+  document.getElementById('profile').scrollIntoView({behavior:'smooth', block:'start'});
+});
+document.getElementById('btnClear').addEventListener('click', () => {
+  document.querySelectorAll('input[type=radio]').forEach(i => { i.checked = false; });
+  render();
+  scrollTo({top:0, behavior:'smooth'});
+});
+document.getElementById('btnJump').addEventListener('click', () => {
+  document.getElementById('profile').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+render();
+</script>
