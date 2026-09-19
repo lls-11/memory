@@ -9,12 +9,17 @@
     "test": "node test/smoke.js",
     "demo:memory": "node demo/memory-demo.js",
     "verify:scale": "node docs/scales/verify.js",
-    "demo:tss": "node docs/scales/tss-scoring.js"
+    "demo:tss": "node docs/scales/tss-scoring.js",
+    "build:pdf": "node docs/scales/build-pdf.mjs",
+    "build:docx": "node docs/scales/build-docx.mjs && node docs/scales/check-docx.mjs"
   },
   "dependencies": {
     "openai": "^4.0.0"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "docx": "^9.7.1"
   }
 }

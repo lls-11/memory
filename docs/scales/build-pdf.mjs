@@ -27,6 +27,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, rmSync } from 'node
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve, basename } from 'node:path';
+import { parse } from './lib/md-parse.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');
@@ -40,35 +41,17 @@ const CHROME = [
 ].find(p => existsSync(p));
 if (!CHROME) { console.error('找不到 Chromium 可执行文件'); process.exit(1); }
 
-// ════════════════════════════════════════════════ 1. Markdown → HTML
-// 覆盖本项目文档实际用到的语法：标题、段落、有序/无序列表（含两级嵌套与
-// 任务列表）、表格（含列对齐）、围栏代码块、引用块、分隔线，以及行内的
-// 粗体/斜体/代码/链接。不追求通用，追求对这几份文档正确。
-
-// 本机字体缺少的符号 → 换成能渲染的文字，避免 PDF 里出现豆腐块
+// ══════════════════════════════════════════════ 1. AST → HTML（渲染端）
+// Markdown 解析在 lib/md-parse.mjs，与 build-docx.mjs 共用同一份解析结果，
+// 两条产线只在渲染端分叉。字形替换属渲染端关注点：本机缺 emoji 字形会渲染成
+// 豆腐块，而 Word 的收件人机器有这些字形，所以只在 PDF 侧替换。
 const GLYPHS = [
   [/✅/g, '【完成】'], [/⚠️|⚠/g, '【部分】'], [/❌/g, '【未做】'],
   [/ℹ️|ℹ/g, '注：'], [/✓/g, '·通过'], [/✗/g, '·失败'],
 ];
-
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const glyph = s => GLYPHS.reduce((t, [re, to]) => t.replace(re, to), s);
 
-function inline(s) {
-  let t = esc(s);
-  // 行内代码优先，避免其中的 * _ 被当作强调
-  const codes = [];
-  t = t.replace(/`([^`]+)`/g, (_, c) => `\u0000${codes.push(c) - 1}\u0000`);
-  t = t.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, txt, href) =>
-    /^https?:/.test(href) ? `<a href="${href}">${txt}</a>` : `<span class="xref">${txt}</span>`);
-  t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  t = t.replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>');
-  t = t.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${esc(codes[+i])}</code>`);
-  for (const [re, to] of GLYPHS) t = t.replace(re, to);
-  return t;
-}
-
-// 「无助 → 无意义 → 绝望 → 无助」闭环图：mermaid 在 PDF 里没法渲染，
-// 换成手写 SVG，内容与 mermaid 源一致。
 const LOOP_SVG = `<figure class="diagram">
 <svg viewBox="0 0 660 230" role="img" aria-label="三感闭环：无助→无意义→绝望→无助"
      xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:560px">
@@ -105,99 +88,58 @@ const LOOP_SVG = `<figure class="diagram">
 <figcaption>图 1　三感闭环。a／b／c 为三条待检验的因果边。</figcaption>
 </figure>`;
 
-// 返回 { title, html }：文档自身的 H1 作为分册标题（保证两处永不分叉），
-// 并从正文中剥掉，避免与分册页头重复。
-function mdToHtml(md) {
-  let title = null;
-  const lines = md.replace(/\r/g, '').split('\n');
-  const h1 = lines.findIndex(l => /^#\s/.test(l));
-  if (h1 !== -1) { title = lines[h1].replace(/^#\s*/, '').trim(); lines.splice(h1, 1); }
+function htmlInline(tokens) {
+  return tokens.map(k => {
+    switch (k.t) {
+      case 'text':   return glyph(esc(k.v));
+      case 'code':   return `<code>${esc(k.v)}</code>`;
+      case 'strong': return `<strong>${htmlInline(k.kids)}</strong>`;
+      case 'em':     return `<em>${htmlInline(k.kids)}</em>`;
+      case 'link':   return /^https?:/.test(k.href)
+        ? `<a href="${k.href}">${htmlInline(k.kids)}</a>`
+        : `<span class="xref">${htmlInline(k.kids)}</span>`;   // 仓库内相对路径不做链接
+      default:       return '';
+    }
+  }).join('');
+}
+
+function astToHtml(blocks) {
   const out = [];
-  let i = 0;
-
-  const flushTable = () => {
-    // 表格：第二行形如 |---|:--:|---:| 时判定
-    const rows = [];
-    let align = null;
-    while (i < lines.length && /^\s*\|/.test(lines[i])) {
-      const cells = lines[i].trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
-      if (rows.length === 1 && cells.every(c => /^:?-{2,}:?$/.test(c))) {
-        align = cells.map(c => c.endsWith(':') ? (c.startsWith(':') ? 'center' : 'right') : 'left');
-      } else rows.push(cells);
-      i++;
-    }
-    if (!rows.length) return;
-    const head = rows.shift();
-    const th = head.map((c, k) =>
-      `<th style="text-align:${align?.[k] || 'left'}">${inline(c)}</th>`).join('');
-    const body = rows.map(r => '<tr>' + r.map((c, k) =>
-      `<td style="text-align:${align?.[k] || 'left'}">${inline(c)}</td>`).join('') + '</tr>').join('');
-    out.push(`<div class="tablewrap"><table><thead><tr>${th}</tr></thead><tbody>${body}</tbody></table></div>`);
-  };
-
-  // 列表：按缩进递归，支持 - / 1. / - [ ]
-  const flushList = (indent) => {
-    const m0 = lines[i].match(/^(\s*)([-*]|\d+\.)\s/);
-    const ordered = /\d/.test(m0[2]);
-    const items = [];
-    while (i < lines.length) {
-      const m = lines[i].match(/^(\s*)([-*]|\d+\.)\s+(.*)$/);
-      if (!m || m[1].length < indent) break;
-      if (m[1].length > indent) {                     // 子列表
-        items[items.length - 1] += flushList(m[1].length);
-        continue;
+  for (const b of blocks) {
+    switch (b.type) {
+      case 'heading':
+        out.push(`<h${b.level}>${htmlInline(b.tokens)}</h${b.level}>`); break;
+      case 'p':
+        out.push(`<p>${htmlInline(b.tokens)}</p>`); break;
+      case 'quote':
+        out.push(`<blockquote>${htmlInline(b.tokens)}</blockquote>`); break;
+      case 'hr':
+        out.push('<hr>'); break;
+      case 'code':
+        out.push(b.lang === 'mermaid'
+          ? LOOP_SVG
+          : `<pre class="block"><code>${esc(b.lines.join('\n'))}</code></pre>`);
+        break;
+      case 'list': {
+        const tag = b.ordered ? 'ol' : 'ul';
+        out.push(`<${tag}>` + b.items.map(it => {
+          const box = it.task === null || it.task === undefined ? ''
+            : `<span class="box">${it.task ? '\u25a0' : '\u25a1'}</span> `;
+          return `<li>${box}${htmlInline(it.tokens)}${astToHtml(it.blocks)}</li>`;
+        }).join('') + `</${tag}>`);
+        break;
       }
-      let text = m[3];
-      const task = text.match(/^\[([ xX])\]\s*(.*)$/);
-      if (task) text = `<span class="box">${task[1].trim() ? '■' : '□'}</span> ${task[2]}`;
-      i++;
-      // 续行（缩进但不是新列表项）
-      const cont = [];
-      while (i < lines.length && /^\s{2,}\S/.test(lines[i]) &&
-             !/^(\s*)([-*]|\d+\.)\s/.test(lines[i]) && !/^\s*\|/.test(lines[i])) {
-        cont.push(lines[i].trim()); i++;
+      case 'table': {
+        const th = b.head.map((c, k) =>
+          `<th style="text-align:${b.align[k]}">${htmlInline(c)}</th>`).join('');
+        const rows = b.rows.map(r => '<tr>' + r.map((c, k) =>
+          `<td style="text-align:${b.align[k]}">${htmlInline(c)}</td>`).join('') + '</tr>').join('');
+        out.push(`<div class="tablewrap"><table><thead><tr>${th}</tr></thead><tbody>${rows}</tbody></table></div>`);
+        break;
       }
-      items.push(`<li>${inline(text)}${cont.length ? ' ' + inline(cont.join(' ')) : ''}`);
     }
-    const tag = ordered ? 'ol' : 'ul';
-    return `<${tag}>${items.map(s => s + '</li>').join('')}</${tag}>`;
-  };
-
-  while (i < lines.length) {
-    const L = lines[i];
-
-    if (/^\s*$/.test(L)) { i++; continue; }
-
-    if (/^```/.test(L)) {                             // 围栏代码块
-      const lang = L.replace(/^```/, '').trim();
-      i++;
-      const buf = [];
-      while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
-      i++;
-      if (lang === 'mermaid') out.push(LOOP_SVG);
-      else out.push(`<pre class="block"><code>${esc(buf.join('\n'))}</code></pre>`);
-      continue;
-    }
-    if (/^#{1,4}\s/.test(L)) {
-      const lv = L.match(/^#+/)[0].length;
-      out.push(`<h${lv}>${inline(L.replace(/^#+\s*/, ''))}</h${lv}>`);
-      i++; continue;
-    }
-    if (/^\s*(---|\*\*\*)\s*$/.test(L)) { out.push('<hr>'); i++; continue; }
-    if (/^\s*\|/.test(L)) { flushTable(); continue; }
-    if (/^\s*([-*]|\d+\.)\s/.test(L)) { out.push(flushList(L.match(/^\s*/)[0].length)); continue; }
-    if (/^>\s?/.test(L)) {
-      const buf = [];
-      while (i < lines.length && /^>\s?/.test(lines[i])) buf.push(lines[i++].replace(/^>\s?/, ''));
-      out.push(`<blockquote>${inline(buf.join(' '))}</blockquote>`);
-      continue;
-    }
-    const buf = [];                                    // 段落
-    while (i < lines.length && !/^\s*$/.test(lines[i]) &&
-           !/^(#{1,4}\s|```|>\s?|\s*\||\s*([-*]|\d+\.)\s|\s*---\s*$)/.test(lines[i])) buf.push(lines[i++]);
-    if (buf.length) out.push(`<p>${inline(buf.join(' '))}</p>`);
   }
-  return { title, html: out.join('\n') };
+  return out.join('\n');
 }
 
 // ════════════════════════════════════════════════════════ 2. 打印样式
@@ -463,7 +405,8 @@ const kb = n => (n / 1024).toFixed(0) + ' KB';
 try {
   // 各分册
   for (const d of DOCS) {
-    const { title, html: body } = mdToHtml(readFileSync(join(ROOT, d.src), 'utf8'));
+    const { title, blocks } = parse(readFileSync(join(ROOT, d.src), 'utf8'));
+    const body = astToHtml(blocks);
     const html = page(d.title, partHead(d.n, title ?? d.title, d.src, false) + body);
     const size = await renderPdf(cdp, html, join(OUT, d.file), `${d.title} · v0.1 草案`,
       { shot: SHOT && d.n === '1' });
@@ -482,7 +425,8 @@ try {
   // 合订本
   const all = COVER + TOC
     + DOCS.map(d => {
-        const { title, html: body } = mdToHtml(readFileSync(join(ROOT, d.src), 'utf8'));
+        const { title, blocks } = parse(readFileSync(join(ROOT, d.src), 'utf8'));
+    const body = astToHtml(blocks);
         return `<section class="part">${partHead(d.n, title ?? d.title, d.src, true)}${body}</section>`;
       }).join('')
     + `<section class="part">${codeBody(true)}</section>`;

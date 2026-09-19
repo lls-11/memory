@@ -4,3 +4,4 @@ data/
 
 # PDF 是构建产物，由 docs/scales/build-pdf.mjs 生成，不入库
 docs/scales/pdf/
+docs/scales/docx/
