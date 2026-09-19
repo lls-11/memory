@@ -7,10 +7,14 @@
   "scripts": {
     "start": "node cli.js",
     "test": "node test/smoke.js",
-    "demo:memory": "node demo/memory-demo.js"
+    "demo:memory": "node demo/memory-demo.js",
+    "verify:scale": "node docs/scales/verify.js",
+    "demo:tss": "node docs/scales/tss-scoring.js"
   },
   "dependencies": {
     "openai": "^4.0.0"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

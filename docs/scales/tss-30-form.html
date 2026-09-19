@@ -12,6 +12,7 @@
   --font-serif:"Songti SC","STSong","Noto Serif CJK SC","Source Han Serif SC",serif;
   --font-sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
   --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --lab:92px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -122,7 +123,6 @@ li.item.answered{background:linear-gradient(90deg, var(--card-2), transparent 60
 .axis{position:relative; height:16px; margin-left:var(--lab); border-bottom:1px solid var(--rule-2)}
 .axis span{position:absolute; bottom:2px; transform:translateX(-50%); font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3)}
 .row{display:grid; grid-template-columns:var(--lab) 1fr; gap:0 10px; align-items:center; padding:7px 0}
-:root{--lab:92px}
 .rowlab{text-align:right}
 .rowlab .nm{font-size:13.5px; font-weight:500; line-height:1.3}
 .rowlab .ch{font-family:var(--font-mono); font-size:10px; color:var(--ink-3); display:block; margin-top:1px}

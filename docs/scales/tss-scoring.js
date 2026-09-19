@@ -31,6 +31,17 @@ export const TSS30 = {
 export const SCALE_MIN = 1, SCALE_MAX = 5;   // 特质版：5 点频率
 const rev = x => SCALE_MIN + SCALE_MAX - x;
 
+// 卷面呈现顺序（施测卷 tss-30-form.html 的顺序，按题库编号）。
+// 卷面按 H→M→D 循环打乱呈现，与题库编号的自然顺序**不同**。
+// 长串指标（连续多少题选了同一个数字）只有在**实际作答顺序**上才有意义，
+// 因此 carelessFlags 默认用这个顺序，而不是题库编号排序。
+// 若用别的卷面/随机化顺序施测，必须通过 opts.order 传入该被试的实际顺序。
+export const PRESENTATION_ORDER = [
+  1, 16, 31,  2, 17, 32,  6, 21, 36, 46,
+  3, 18, 33,  7, 22, 37, 11, 26, 41, 47,
+  8, 24, 39, 12, 27, 42, 13, 29, 44, 52,
+];
+
 // -------------------------------------------------------------------- 计分
 // responses: { 条目号: 原始分 }；缺失用 null/undefined 表示
 // 规则：某分量表缺失 > 25% 则该分量表记为 null（不做插补）；否则按已答题均值
@@ -71,9 +82,14 @@ export const CARELESS_DEFAULTS = {
   irvMin: 0.30,       // < 该值 → 标记（几乎无变异）
   reverseGap: 2.0,    // ≥ 该值 → 标记（反向题与正向题方向矛盾）
 };
-export function carelessFlags(responses, spec = TSS30, thresholds = {}) {
+export function carelessFlags(responses, spec = TSS30, opts = {}) {
+  const { order: rawOrder, ...thresholds } = opts;
   const th = { ...CARELESS_DEFAULTS, ...thresholds };
-  const order = Object.values(spec).flatMap(s => s.items).sort((a, b) => a - b);
+  const inSpec = new Set(Object.values(spec).flatMap(s => s.items));
+  // 默认用卷面呈现顺序；传入 order 时以其为准（只保留属于本 spec 的题）
+  const order = (rawOrder ?? PRESENTATION_ORDER).filter(it => inSpec.has(it));
+  if (order.length !== inSpec.size)
+    throw new Error(`作答顺序与 spec 不匹配：顺序含 ${order.length} 题，spec 有 ${inSpec.size} 题`);
   const seq = order.map(it => responses[it]).filter(v => v !== null && v !== undefined);
 
   // (a) 最长同一答案连续串（long-string index）
@@ -102,10 +118,12 @@ export function carelessFlags(responses, spec = TSS30, thresholds = {}) {
   if (longest >= th.longString) hits.push(`长串 ${longest}≥${th.longString}`);
   if (irv < th.irvMin) hits.push(`IRV ${irv.toFixed(2)}<${th.irvMin}`);
   if (maxGap >= th.reverseGap) hits.push(`反向题偏离 ${maxGap.toFixed(2)}≥${th.reverseGap}`);
+  // 返回未取整的原值：取整属于展示层的事，放在计算函数里会让阈值判断
+  // 和跨实现比对出现不可控的偏差。
   return {
     longString: longest,
-    irv: Number(irv.toFixed(3)),
-    reverseGap: Number(maxGap.toFixed(3)),
+    irv,
+    reverseGap: maxGap,
     thresholds: th,
     hits,
     flagged: hits.length > 0,
@@ -245,16 +263,19 @@ const SCENARIOS = {
   },
 };
 
+// 以下演示只在直接执行本文件时运行；被 import 时保持安静（verify.js 依赖这一点）
+const RUN_AS_MAIN = process.argv[1] && import.meta.url.endsWith(
+  process.argv[1].replace(/\\/g, '/').split('/').pop());
 const only = process.argv.includes('--demo') ? process.argv[process.argv.indexOf('--demo') + 1] : null;
 
-if (only !== 'score') {
+if (RUN_AS_MAIN && only !== 'score') {
   console.log('TSS 双因子结构诊断 · 三个预设情景');
   console.log('判据（预注册）: ωH≥.80 且 ECV≥.70 → 本质单维；分量表需 ωHS≥.30 方可单独解释');
 console.log('PUC 只报告不设门槛——它由维度数×题数决定（3×9 恒为 .692），与数据无关');
   for (const sc of Object.values(SCENARIOS)) report(sc.label, sc.model);
 }
 
-if (only !== 'bi') {
+if (RUN_AS_MAIN && only !== 'bi') {
   console.log('\n\n═══ 计分示例 ═══');
   // 反向题为 8 / 18 / 33；认真作答者在这三题上的原始分应与正向题相反
   const cases = {
@@ -273,7 +294,8 @@ if (only !== 'bi') {
     console.log(`\n${name}`);
     console.log(`  H=${scores.H?.toFixed(2)} M=${scores.M?.toFixed(2)} ` +
       `D=${scores.D?.toFixed(2)} PD=${scores.PD?.toFixed(2)} 总分=${scores.TOTAL?.toFixed(2)}`);
-    console.log(`  筛查: 最长同答串=${f.longString} IRV=${f.irv} 反向题偏离=${f.reverseGap}` +
+    console.log(`  筛查: 最长同答串=${f.longString} IRV=${f.irv.toFixed(3)}` +
+      ` 反向题偏离=${f.reverseGap.toFixed(3)}` +
       ` → ${f.flagged ? '⚠ 标记待排除（' + f.hits.join('；') + '）' : '通过'}`);
   }
   // 缺失处理
