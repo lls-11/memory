@@ -320,6 +320,13 @@ async function renderPdf(cdp, html, outFile, footTitle, { shot = false } = {}) {
 }
 
 // ════════════════════════════════════════════════════════ 4. 内容组装
+// 危机干预系列（需求 1–6 + 证据层）。--crisis 只出这一组。
+const CRISIS = [
+  { n: 'E', src: 'docs/crisis/00-evidence-base.md', short: '证据基础与核查记录', file: 'C0-证据基础与核查记录.pdf' },
+  { n: '1', src: 'docs/crisis/01-dbt-for-crisis.md', short: 'DBT 用于危机干预', file: 'C1-DBT用于危机干预.pdf' },
+  { n: '2', src: 'docs/crisis/02-risk-assessment.md', short: '结构化初步风险评估', file: 'C2-结构化初步风险评估.pdf' },
+];
+
 const DOCS = [
   { n: '1', src: 'docs/experiments/three-senses-loop.md',
     title: '三感闭环实验设计', desc: '无助 / 无意义 / 绝望 的因果闭环如何验证',
@@ -403,6 +410,24 @@ const made = [];
 const kb = n => (n / 1024).toFixed(0) + ' KB';
 
 try {
+  // --crisis：只出危机干预这一组，各自独立成册
+  if (process.argv.includes('--crisis')) {
+    for (const d of CRISIS) {
+      const { title, blocks } = parse(readFileSync(join(ROOT, d.src), 'utf8'));
+      const body = astToHtml(blocks);
+      const html = page(d.short,
+        `<div class="part-head"><div class="n">危机干预系列 · ${d.n}</div>
+         <h1>${esc(title ?? d.short)}</h1><div class="src">${esc(d.src)}</div></div>` + body);
+      made.push([d.file, await renderPdf(cdp, html, join(OUT, d.file),
+        `${d.short} · v0.2（已文献核查）`)]);
+    }
+    cdp.close();
+    rmSync(join(OUT, '.chrome-profile'), { recursive: true, force: true });
+    console.log('PDF 已生成 →', OUT);
+    for (const [f, sz] of made.sort()) console.log(`  ${f.padEnd(34)} ${kb(sz).padStart(8)}`);
+    process.exit(0);
+  }
+
   // 各分册
   for (const d of DOCS) {
     const { title, blocks } = parse(readFileSync(join(ROOT, d.src), 'utf8'));

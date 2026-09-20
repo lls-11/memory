@@ -256,6 +256,13 @@ const partHead = (kicker, title, src) => [
 ];
 
 // ───────────────────────────────────────────────────────── 内容清单
+// 危机干预系列（需求 1–6 + 证据层）。--crisis 只出这一组。
+const CRISIS = [
+  { n: 'E', src: 'docs/crisis/00-evidence-base.md', short: '证据基础与核查记录', file: 'C0-证据基础与核查记录.docx' },
+  { n: '1', src: 'docs/crisis/01-dbt-for-crisis.md', short: 'DBT 用于危机干预', file: 'C1-DBT用于危机干预.docx' },
+  { n: '2', src: 'docs/crisis/02-risk-assessment.md', short: '结构化初步风险评估', file: 'C2-结构化初步风险评估.docx' },
+];
+
 const DOCS = [
   { n: '1', src: 'docs/experiments/three-senses-loop.md', short: '三感闭环实验设计',
     file: '01-实验设计-三感闭环.docx' },
@@ -397,6 +404,21 @@ async function write(name, document) {
   const buf = await Packer.toBuffer(document);
   writeFileSync(join(OUT, name), buf);
   made.push([name, buf.length]);
+}
+
+// --crisis：只出危机干预这一组
+if (process.argv.includes('--crisis')) {
+  for (const d of CRISIS) {
+    numInstance = 0;
+    const { title, blocks } = parse(readFileSync(join(ROOT, d.src), 'utf8'));
+    await write(d.file, doc(`${d.short} · v0.2（已文献核查）`, [
+      ...partHead(`危机干预系列 · ${d.n}`, title ?? d.short, d.src, false),
+      ...blocksToDocx(blocks),
+    ]));
+  }
+  console.log('Word 已生成 →', OUT);
+  for (const [f, sz] of made.sort()) console.log(`  ${f.padEnd(36)} ${(sz/1024).toFixed(0).padStart(6)} KB`);
+  process.exit(0);
 }
 
 // 分册
