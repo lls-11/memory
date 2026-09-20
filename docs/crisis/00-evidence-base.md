@@ -5,8 +5,9 @@
 > 两份文档里的 `[R#]` 编号指向 §3 的文献表；`【实证】【共识】【推论】【本项目】`
 > 四类标记的含义见 §1。
 >
-> **核查日期：2026-09-20。** §2 记录了这次核查**改动了什么、为什么改**——
-> 有五条是实质修正，不是补引文。
+> **核查日期：2026-09-20（第一轮）／2026-09-21（第二轮，补核原文）。**
+> §2 记录两轮核查**改动了什么、为什么改**。第一轮五条实质修正，
+> 第二轮把 R16–R26 逐条核实，又得到**两条新的实质发现**（§2.4）。
 
 ---
 
@@ -29,8 +30,8 @@
    或补上实证依据后才升格。
 2. **标记缺失视为【推论】。** 未标记不等于有实证。
 3. **文献表的核验状态另有标记**（§3 的"核"列）：
-   `✔` = 本次联网核实到出处与主要结论；`○` = 按领域常识引用，**未核实原文**。
-   `○` 类不得作为规程依据。
+   `✔` = 已核实出处与主要结论；`◐` = **结论已核实、书目细节待确认**；
+   `○` = 按领域常识引用，**未核实**。`○` 类不得作为规程依据。
 
 ---
 
@@ -110,29 +111,82 @@
 > 最后一行的研究设计要标明：**它是队列比较，不是 RCT**。
 > 把它说成 RCT 会高估证据等级。
 
-### 2.3 一处必须呈现的反对意见
+### 2.3 一处必须呈现的反对意见（第一轮的描述已被第二轮更正）
 
-`02` §8 的核心主张（风险分层不能预测个体行为）有扎实的支持
-`[R5][R6][R7][R14]`，但**这个立场在领域内并非无人反对**：
-已有文献从方法学角度批评这些批评"过时"、并主张新一代预测模型的表现值得重估
-`[R15]`。
+`02` §8 的核心主张（个体层面的风险分类不可靠）有扎实支持 `[R5][R6][R7][R14]`，
+而领域内确实存在反对声音 `[R15]`。
 
-**我没有读到该文全文，因此不对双方孰是孰非下判断。** 但材料里必须写明存在争论，
-否则是把一方观点当成定论。
+> **第一轮我只看到 R15 的标题，把它记为"批评这些批评过时"，并说不下判断——
+> 这个描述不准确，已由 §2.4 发现一更正。**
+> 读到其论点后可知：该文同样指出分类取向的局限，双方的分歧在**评价指标**上，
+> 不在"要不要用等级分配照护"上。详见 §2.4。
 
-对本项目的实际影响不大——因为本材料的做法（不用等级分配资源、
-用二维矩阵驱动动作、把"低风险"明确排除为不行动的依据）在两种立场下都成立。
+### 2.4 第二轮核查得到的两条新发现
 
-### 2.4 明确标注为【本项目】的部分
+**发现一 · 「反对意见」其实也反对高/中/低分类法——争论的焦点不是我以为的那个**
+
+第一轮我只看到 R15 的标题，把它记为"批评这些批评过时"，并说不下判断。
+第二轮读到其论点后，需要更正这个描述：
+
+Seyedsalehi & Fazel (2024) `[R15]` 的实际主张是：
+
+1. **他们同样指出"分类取向"（classification approach）的局限** ——
+   这与 Large / Carter 一致，不是对立；
+2. 他们反对的是**把阳性预测值（PPV）当作评价预测模型的主要指标**——
+   因为 PPV 随基础率与患病率变动，不是评价模型的恰当度量；
+3. 他们主张文献长期忽视了**校准度（calibration）**；
+4. 并主张用**净效益（net benefit）**等指标评估临床效用与健康经济价值。
+
+> 所以这场争论的焦点**不是"风险评估有没有用"，而是"该用什么指标判断它有没有用"**。
+> 双方**都不主张**用高/中/低等级去分配照护资源。
+>
+> 这对本材料是个好消息：`02` §8 的做法（不用等级分配资源、用二维矩阵驱动动作、
+> 把"低风险"明确排除为不行动的依据）在**双方立场下都成立**，
+> 而且第 2 点还给了本材料一个此前没有的理由——
+> **不要用 PPV 去论证"风险评估无用"，那是用错了指标**。
+>
+> 因此 `02` §8 的论证方式已改：从"PPV 太低所以不能预测"改为
+> **"基础率极低使个体层面的分类判断不可靠；而分类本身不是正确的工具形态"**。
+
+**发现二 · 绝望感可能同时有状态与特质两面，而三感模型只当它是状态**
+
+核实 Beck 的两项前瞻研究时发现一个本材料没有处理的问题：
+
+- Beck et al. (1985) `[R27]`：住院有自杀意念者的 **10 年**前瞻研究；
+- Beck et al. (1990) `[R28]`：1,958 名门诊患者的**重复验证**，
+  贝克绝望量表（BHS）**切分 ≥ 9 捕捉到 17 例最终自杀中的 16 例（94.2%）**，
+  高危组自杀可能性为其余人的 **11 倍**。
+
+**这两项研究测到的是跨 10 年的预测力**——也就是说，绝望在这里的行为更像
+**特质**，而不是本材料在三感里处理的那个**当下状态**。
+
+> 对本材料的含义：`02` 把绝望感放在急性侧（Pain/三感打分），
+> 这对"此刻要不要行动"是对的；但**绝望还有一个长程的、特质性的面**，
+> 它应当同时进入**慢性**侧的基线计算。本次已在 `02` §3.2 补上这一行。
+>
+> 这也是三感模型（【本项目】）需要修正的一处：
+> 动机链把三感都当作状态处理，而至少绝望感有稳定的特质成分。
+
+**顺带一个对系统设计极有用的例子**：R28 的 94.2% 是**敏感度**，不是阳性预测值。
+1,958 人中仅 17 例自杀（基础率 0.87%），要捕捉其中 16 例，
+被标记的高危组里必然包含大量不会自杀的人——**所以它的 PPV 必然很低**。
+
+> 同一项研究既是"绝望感值得测"的最强证据，又是"高敏感度 ≠ 临床可用"的最好教材。
+> 这个例子已写进 `02` §8。
+
+### 2.5 明确标注为【本项目】的部分
 
 **"三感 = 动机链三处断裂"这一模型，以及由它推出的闭环与跃迁点，是本项目的
 理论主张，未经任何检验。**
 
 其构成部件各自有文献根基：
 
-- 无助感 ← 习得性无助及其 2016 年重构 `[R1]`
-- 绝望感 ← 绝望理论（Abramson et al. 1989）`[R16]`、Beck 绝望量表 `[R17]`
-- 无意义感 ← 意义的三成分（目的/重要性/连贯性）`[R18][R19]`
+- 无助感 ← 人类习得性无助的三联设计 `[R23]` 及其 2016 年重构 `[R1]`
+- 绝望感 ← 绝望理论 `[R16]`、Beck 绝望量表 `[R17]`，及其 **10 年前瞻证据** `[R27][R28]`
+- 无意义感 ← 意义的三成分 `[R18][R19]`。**两套框架用词不同但收敛**：
+  Martela & Steger 作 coherence / purpose / significance，
+  George & Park 作 comprehension / purpose / mattering，
+  正好对应本项目量表的 **连贯性 / 目的 / 重要性** 三个侧面
 
 但**把三者串成一条有方向的动机链（行动→结果→价值→未来），
 并主张它们按 H→M→D 顺序传导**，是本项目的假设，不是文献结论。
@@ -170,28 +224,41 @@
 | R12 | Ribeiro JD, Franklin JC, Fox KR, Bentley KH, Kleiman EM, Chang BP, Nock MK. (2016). Self-injurious thoughts and behaviors as risk factors for future suicide ideation, attempts, and death: a meta-analysis of longitudinal studies. *Psychological Medicine*, 46(2), 225–236. | ✔ | 自伤史 → 后续企图约 2 倍、死亡约 1.5 倍；效应量中等（修正二）|
 | R13 | Pigeon WR, Pinquart M, Conner K. (2012). Meta-analysis of sleep disturbance and suicidal thoughts and behaviors. *J Clin Psychiatry*, 73(9), e1160–e1167. | ✔ | 睡眠障碍 RR 1.95–2.95，抑郁不调节 |
 | R14 | Large MM, et al. (2018). Suicide risk assessment: Risk stratification is not accurate enough to be clinically useful and alternative approaches are needed. *Crisis*, 39(4). | ✔ | 分层不足以用于临床决策 |
-| R15 | （反对意见）Suicide risk assessment tools and prediction models: new evidence, methodological innovations, outdated criticisms. (2024). *PMC11021746*. | ✔ | **仅核实其存在与论旨**；用于呈现争论（§2.3），未读全文 |
+| R15 | Seyedsalehi A, Fazel S. (2024). Suicide risk assessment tools and prediction models: new evidence, methodological innovations, outdated criticisms. *BMJ Mental Health*, 27(1), e300990. | ✔ | 反对意见：反对以 PPV 为主要评价指标，主张重视校准度与净效益；**同样指出分类取向的局限**（§2.4 发现一）|
 
-### 未核实原文（按领域常识引用，待查）
+### 第二轮补核（R16–R26）
 
-| # | 文献 | 核 | 用途 |
+| # | 文献 | 核 | 本材料用它支持什么 |
 |---|---|:--:|---|
-| R16 | Abramson LY, Metalsky GI, Alloy LB. (1989). Hopelessness depression: A theory-based subtype of depression. *Psychological Review*, 96(2). | ○ | 绝望的稳定-全局归因 |
-| R17 | Beck AT, et al. (1974). The measurement of pessimism: The Hopelessness Scale. *J Consult Clin Psychol*, 42(6). | ○ | 绝望的测量 |
-| R18 | Martela F, Steger MF. (2016). The three meanings of meaning in life. *J Positive Psychology*. | ○ | 意义的三成分 |
-| R19 | George LS, Park CL. (2016). Meaning in life as comprehension, purpose, and mattering. *Review of General Psychology*. | ○ | 同上 |
-| R20 | Linehan MM. (1993). *Cognitive-Behavioral Treatment of Borderline Personality Disorder*. Guilford. | ○ | 生物社会理论、辩证策略、目标行为层级 |
-| R21 | Linehan MM. (2015). *DBT Skills Training Manual*, 2nd ed. Guilford. | ○ | TIPP、PLEASE、DEAR MAN 等技巧的规程 |
-| R22 | Linehan MM. (1997). Validation and psychotherapy. In *Empathy Reconsidered*. APA. | ○ | 验证六级 |
-| R23 | Hiroto DS, Seligman MEP. (1975). Generality of learned helplessness in man. *JPSP*, 31(2). | ○ | 人类习得性无助的三联设计 |
-| R24 | Spencer SJ, Zanna MP, Fong GT. (2005). Establishing a causal chain. *JPSP*, 89(6). | ○ | 实验因果链设计（用于三感实验设计）|
-| R25 | Joiner TE. (2005). *Why People Die by Suicide*. Harvard UP. | ○ | 获得性能力 |
-| R26 | Gould MS, et al. 自杀集群与传染效应相关研究 | ○ | `06` §5.2 的传染效应——**引文不完整，须补** |
+| R16 | Abramson LY, Metalsky GI, Alloy LB. (1989). Hopelessness depression: A theory-based subtype of depression. *Psychological Review*, 96(2). | ○ | 绝望的稳定-全局归因。**本轮仍未核实原文**；但其经验含义已由 R27/R28 承担 |
+| R17 | Beck AT, Weissman A, Lester D, Trexler L. (1974). The measurement of pessimism: The Hopelessness Scale. *J Consult Clin Psychol*, 42(6). | ○ | BHS 的编制。**未核实原文**；其预测用途已由 R28 核实 |
+| R18 | Martela F, Steger MF. (2016). The three meanings of meaning in life: Distinguishing coherence, purpose, and significance. *The Journal of Positive Psychology*, 11(5), 531–545. | ✔ | 意义三成分：coherence（可理解、讲得通）/ purpose（核心目标与方向）/ significance（生命本身有价值、值得活） |
+| R19 | George LS, Park CL. (2016). Meaning in life as comprehension, purpose, and mattering: Toward integration and new research questions. *Review of General Psychology*, 20(3), 205–220. | ✔ | 三元观：comprehension / purpose / mattering；**目前的主流观点**，与 R18 收敛 |
+| R20 | Linehan MM. (1993). *Cognitive-Behavioral Treatment of Borderline Personality Disorder*. Guilford. | ○ | 生物社会理论、辩证策略、目标行为层级。**书籍，未核实原文** |
+| R21 | Linehan MM. (2015). *DBT Skills Training Manual*, 2nd ed. Guilford. | ○ | TIPP / PLEASE / DEAR MAN 等技巧规程。**书籍，未核实原文** |
+| R22 | Linehan MM. (1997). Validation and psychotherapy. In Bohart AC & Greenberg LS (Eds.), *Empathy Reconsidered: New Directions in Psychotherapy*. Washington DC: APA. | ✔ | 验证六级，自 L1**在场**至 L6**彻底的真诚**；并指出验证包含但**多于**共情 |
+| R23 | Hiroto DS, Seligman MEP. (1975). Generality of learned helplessness in man. *JPSP*, 31(2), 311–327. | ✔ | 人类习得性无助的**三联设计**（可控/不可控但等强度等时长/无暴露），噪音范式 |
+| R24 | Spencer SJ, Zanna MP, Fong GT. (2005). Establishing a causal chain. *JPSP*, 89(6). | ○ | 实验因果链设计。**未核实**；且它只被实验设计文档引用，`01`/`02` 未用 |
+| R25 | Joiner TE. (2005). *Why People Die by Suicide*. Harvard UP. | ✔ | 获得性能力：对死亡的恐惧降低 + 疼痛耐受升高，源于对疼痛性/挑逗性事件的习惯化；**最直接的获得途径是自我伤害行为** |
+| R26 | ~~Gould 等，引文不完整~~ → **已由 R30–R32 取代** | — | — |
 
-> **R26 是一处已知缺口**：`06` 文档的"传染效应"与 postvention 建议目前只有
-> 【共识】级支撑，本次未核实。若该建议要写进机构规程，须先补这一块的文献。
+### 第二轮新增（核查过程中找到的更合适文献）
 
----
+| # | 文献 | 核 | 本材料用它支持什么 |
+|---|---|:--:|---|
+| R27 | Beck AT, Steer RA, Kovacs M, Garrison B. (1985). Hopelessness and eventual suicide: A 10-year prospective study of patients hospitalized with suicidal ideation. *Am J Psychiatry*, 142(5), 559–563. | ✔ | 绝望的**长程**前瞻预测力 |
+| R28 | Beck AT, Brown G, Berchick RJ, Stewart BL, Steer RA. (1990). Relationship between hopelessness and ultimate suicide: A replication with psychiatric outpatients. *Am J Psychiatry*, 147(2), 190–195. | ✔ | 1,958 名门诊患者；BHS **切分 ≥ 9 捕捉 17 例最终自杀中的 16 例（94.2%）**，高危组风险为其余人的 **11 倍**。同时是"敏感度 ≠ PPV"的教材（§2.4） |
+| R29 | Chu C, Buchman-Schmitt JM, Stanley IH, Hom MA, Tucker RP, Hagan CR, et al. (2017). The interpersonal theory of suicide: A systematic review and meta-analysis of a decade of cross-national research. *Psychological Bulletin*, 143(12), 1313–1345. | ✔ | 人际理论（含获得性能力）的实证综述：**整体有支持** |
+| R30 | Gould MS, Wallenstein S, Davidson L. (1989). Suicide clusters: A critical review. *Suicide and Life-Threatening Behavior*, 19(1). | ✔ | 自杀集群的存在与特征 |
+| R31 | Gould MS, Jamieson P, Romer D. (2003). Media contagion and suicide among the young. *American Behavioral Scientist*, 46(9). | ✔ | 媒体报道的传染效应；易感个体特征 |
+| R32 | Insel BJ, Gould MS. (2008). 关于青少年暴露于同伴自杀行为影响的综述（16 项研究）| ◐ | **结论已核实**：多数研究发现暴露于同伴自杀行为与后续自杀企图显著关联，**自杀企图的 OR 约 2.8–11.0**；约 **1–5%** 的青少年自杀发生在集群中。**书目细节待确认** |
+
+> **R26 的缺口已补上**：`06` §5.2 的传染效应与 postvention 建议现由
+> `[R30][R31][R32]` 支撑，从【共识】升为【实证】（R32 的书目待确认）。
+>
+> **仍然未核实的只剩 5 条**：R16、R17（其经验含义已由 R27/R28 承担）、
+> R20、R21（两本 Guilford 教材），以及 R24（不被 `01`/`02` 引用）。
+> 这四条都是书籍或其作用已被他文承担，**不再影响 `01`/`02` 的任何条文**。
 
 ## 4. 解释链条的统一格式
 
