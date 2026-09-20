@@ -367,111 +367,9 @@
 | ③④ | 第 1→2 层 | 危机生存 → 承诺/安全计划 |
 | ② | 第 2→3 层 | 关系维持 + 生活质量（睡眠优先）|
 | ① | 第 3→4 层 | 问题解决、技能、意义 |
+## 7. 初步评估的会谈顺序
 
----
-
-## 7. 结构化输出
-
-### 7.1 一条设计原则：未评估 ≠ 阴性
-
-上游的 0–3 打分系统没有"未评估"这个取值，于是"没问到"会被当成"没有"。
-在风险评估里这是不可接受的——尤其当对话被中断、学生拒答、或 AI 因层级规则
-停止访谈时，大量条目本来就**不该**有分数。
-
-所以结构化输出必须区分三种状态：**阳性 / 阴性 / 未评估**，并显式列出未评估项。
-
-### 7.2 输出 schema
-
-```json
-{
-  "assessment_id": "string",
-  "timestamp": "ISO8601",
-  "contact_mode": "text | voice | in_person",
-
-  "acute": {
-    "level": "A0 | A1 | A2 | A3 | A4",
-    "ideation_step": "0-6 | unassessed",
-    "means": {
-      "specified": "yes | no | unassessed",
-      "availability": "at_hand | in_dorm | requires_outing | none | unassessed",
-      "restriction_done": "yes | no | not_applicable",
-      "custodian": "string | null"
-    },
-    "amplifiers": {
-      "agitation": "yes | no | unassessed",
-      "insomnia_acute_worsening": "yes | no | unassessed",
-      "substance_current": "yes | no | unassessed"
-    },
-    "six_changes": ["性情|行为|财务|语言|身体|环境"],
-    "reset_time": "minutes | hours | all_day | unassessed"
-  },
-
-  "chronic": {
-    "level": "C0 | C1 | C2",
-    "prior_attempt": {
-      "present": "yes | no | unassessed",
-      "within_12m": "yes | no | unassessed",
-      "count": "integer | unassessed",
-      "high_lethality": "yes | no | unassessed"
-    },
-    "nssi": {
-      "present": "yes | no | unassessed",
-      "intent": "regulation | mixed | suicidal | unclear | unassessed",
-      "escalation_signs": ["method|site|sutures|frequency|substance|dissociation"]
-    },
-    "factors": ["family_suicide", "psych_dx", "substance_use_disorder",
-                "trauma_history", "chronic_illness", "financial", "isolation",
-                "sgm_unsupported", "post_discharge"]
-  },
-
-  "three_senses": {
-    "helplessness": "0-3 | unassessed",
-    "meaninglessness": "0-3 | unassessed",
-    "hopelessness": "0-3 | unassessed",
-    "dominant": "H | M | D | mixed | none",
-    "note": "保留三维向量，不计算总分"
-  },
-  "stage": "挫折 | 自责 | 敏感 | 无望 | 行动 | unassessed",
-
-  "protective": {
-    "mobilizable_now": ["contactable_person", "person_can_come",
-                        "means_custodian", "not_alone_tonight"],
-    "internal": ["past_crisis_survived", "unfinished_own_goals",
-                 "values_against_suicide"],
-    "structural": ["in_treatment", "insurance", "advisor_channel"],
-    "applied_to_downgrade": false
-  },
-
-  "red_flags": [{ "id": "1-13", "evidence": "来访者原话引用" }],
-
-  "disposition": {
-    "matrix_cell": "1-7",
-    "upstream_level": "不存在 | 轻微 | 中等 | 严重 | 极严重",
-    "priority_layer": "0 | 1 | 2 | 3 | 4",
-    "mode": "safety_only | crisis_survival | commitment | maintenance | problem_solving",
-    "actions": ["string"],
-    "human_handoff": "required_now | within_24h | routine | none",
-    "confidentiality_break": "yes | no"
-  },
-
-  "unassessed_items": ["string"],
-  "confidence": "high | medium | low",
-  "limitations": "string"
-}
-```
-
-### 7.3 两条不可协商的输出约束
-
-1. **`red_flags` 非空 → `upstream_level` 必须为"极严重"，`priority_layer` 必须为 0 或 1。**
-   不允许被保护因子或低慢性风险抵消。
-2. **`acute.level ≥ A3` 时 `protective.applied_to_downgrade` 必须为 false。**
-   这条把 §4.1 的硬规则写进了数据结构，使违规可被自动检出。
-
----
-
-## 8. 初步评估的会谈顺序
-
-### 8.1 完整版（约 15–20 分钟）
+### 7.1 完整版（约 15–20 分钟）
 
 顺序遵循 4P（Pain → Plan → History → Pluses），并按 01 文档 §3.3 的验证-追问交替节律。
 
@@ -493,7 +391,7 @@
    优先问可立即动员的
 9. **安全安排与承诺**（2 分钟）：今晚谁在旁边、手段寄放给谁、下次接触的**具体时间**
 
-### 8.2 极简分诊版（90 秒，用于首轮判定是否需要完整评估）
+### 7.2 极简分诊版（90 秒，用于首轮判定是否需要完整评估）
 
 当接触时间极短、或需要在大量对话中快速分流时，只问四件事：
 
@@ -509,7 +407,7 @@
 
 ---
 
-## 9. 方法论边界（必须写进系统文档，不是免责声明）
+## 8. 方法论边界（必须写进系统文档，不是免责声明）
 
 **第一，风险分层不能预测个体行为。** 所有自杀风险评估工具的个体预测效力都很差——
 因为自杀的基础率极低，任何量表的阳性预测值都低得无法支撑个体判断。
@@ -544,7 +442,7 @@
 
 ---
 
-## 10. 可直接进上游系统的修改清单
+## 9. 可直接进上游系统的修改清单
 
 按改动成本排序。第 1 条是结构性改动，其余可增量实施。
 
@@ -560,11 +458,10 @@
 | 8 | Plan 模块按**六级阶梯**输出台阶数，而非仅"有/无计划" | Plan 模块 | §2.1 |
 | 9 | 自伤**意图分离**一问；自伤的急性与慢性分别计入，不混为一谈 | 新增模块 | §3.3 |
 | 10 | 标签库补：家族自杀史、物质使用障碍、长期社会孤立（4P 教材原有，转写时丢失）| 画像标签 | §3.2 |
-| 11 | 输出 schema 增加 **unassessed** 状态与 `unassessed_items`；未评估不得当作阴性 | 输出结构 | §7.1 |
-| 12 | 硬约束：`acute ≥ A3` 时保护因子不参与降级（写进 schema 并可自动检出）| 输出结构 | §4.1 / §7.3 |
-| 13 | Pain 增加"单次唤起回落时间"；失眠改为**测变化率**而非绝对水平 | 4P-Pain | §2.3 |
-| 14 | 「获取承诺」替换为**安全计划六步**；删除任何形式的不自杀契约 | 六步模式第 6 步 | §9 |
-| 15 | 保护因子询问**按三感主导分支**；无意义感主导者禁用"放不下的人" | Pluses 分支 | §4.3 |
+| 11 | 硬约束：`acute ≥ A3` 时保护因子不参与降级 | 分级逻辑 | §4.1 |
+| 12 | Pain 增加"单次唤起回落时间"；失眠改为**测变化率**而非绝对水平 | 4P-Pain | §2.3 |
+| 13 | 「获取承诺」替换为**安全计划六步**；删除任何形式的不自杀契约 | 六步模式第 6 步 | §8 |
+| 14 | 保护因子询问**按三感主导分支**；无意义感主导者禁用"放不下的人" | Pluses 分支 | §4.3 |
 
 ---
 
@@ -575,6 +472,6 @@
 | 五层优先级（做什么、什么顺序）| 二维矩阵（现在在哪一格）→ 映射到层级（§6.3）|
 | 唤醒度开关（危机生存 vs 问题解决）| 急性等级 A0–A4 提供开关的输入 |
 | 验证六级与 V- 边界 | Pluses 的前置条件（至少一次 L5）|
-| 承诺策略 | 承诺的**内容**＝安全计划六步（§9）|
+| 承诺策略 | 承诺的**内容**＝安全计划六步（§8）|
 | 三感 = 动机链三处断裂 | 决定保护因子的询问分支（§4.3）与层内顺序 |
 | DBT 对无意义感覆盖弱 | 无意义感主导者在矩阵里**可能落在急性低格但仍需第 1 层**（六变全阴性）|
